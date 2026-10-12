@@ -126,6 +126,7 @@ do
 
   -- Enable break indent
   vim.o.breakindent = true
+  vim.o.shiftwidth = 2
 
   -- Enable undo/redo changes even after closing and reopening a file
   vim.o.undofile = true
@@ -156,7 +157,9 @@ do
   --   See `:help lua-options`
   --   and `:help lua-guide-options`
   vim.o.list = true
-  vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+  vim.opt.listchars = { tab = "  ", trail = '·', nbsp = '␣' }
+
+  vim.bo.cindent = true
 
   -- Preview substitutions live, as you type!
   vim.o.inccommand = 'split'
@@ -171,6 +174,8 @@ do
   -- instead raise a dialog asking if you wish to save the current file(s)
   -- See `:help 'confirm'`
   vim.o.confirm = true
+
+  vim.opt.fillchars:append({fold = ' '})
 end
 
 -- ============================================================
@@ -210,6 +215,8 @@ do
   }
 
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+  vim.keymap.set('n', '<leader>e', ':Neotree toggle reveal<CR>', { desc = 'Open file explorer' })
+  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Open Code Actions' })
 
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
   -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -350,57 +357,57 @@ do
   --
   -- See `:help gitsigns` to understand what each configuration key does.
   -- Adds git related signs to the gutter, as well as utilities for managing changes
-  vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
-  local gitsigns = require 'gitsigns'
-  gitsigns.setup {
-    signs = {
-      add = { text = '+' }, ---@diagnostic disable-line: missing-fields
-      change = { text = '~' }, ---@diagnostic disable-line: missing-fields
-      delete = { text = '_' }, ---@diagnostic disable-line: missing-fields
-      topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
-      changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
-    },
-    -- gitsigns.nvim's recommended keymaps:
-    on_attach = function(bufnr)
-      -- Navigation
-      vim.keymap.set('n', ']c', function()
-        if vim.wo.diff then
-          vim.cmd.normal { ']c', bang = true }
-        else
-          gitsigns.nav_hunk 'next'
-        end
-      end, { desc = 'Jump to next git [c]hange', buf = bufnr })
-
-      vim.keymap.set('n', '[c', function()
-        if vim.wo.diff then
-          vim.cmd.normal { '[c', bang = true }
-        else
-          gitsigns.nav_hunk 'prev'
-        end
-      end, { desc = 'Jump to previous git [c]hange', buf = bufnr })
-
-      -- Visual mode actions
-      vim.keymap.set('v', '<leader>hs', function() gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' } end, { desc = 'git [s]tage hunk', buf = bufnr })
-      vim.keymap.set('v', '<leader>hr', function() gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' } end, { desc = 'git [r]eset hunk', buf = bufnr })
-      -- Normal mode actions
-      vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk', buf = bufnr })
-      vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk', buf = bufnr })
-      vim.keymap.set('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer', buf = bufnr })
-      vim.keymap.set('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer', buf = bufnr })
-      vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk', buf = bufnr })
-      vim.keymap.set('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'git preview hunk [i]nline', buf = bufnr })
-      vim.keymap.set('n', '<leader>hb', function() gitsigns.blame_line { full = true } end, { desc = 'git [b]lame line', buf = bufnr })
-      vim.keymap.set('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index', buf = bufnr })
-      vim.keymap.set('n', '<leader>hD', function() gitsigns.diffthis '~' end, { desc = 'git [D]iff against last commit', buf = bufnr })
-      vim.keymap.set('n', '<leader>hQ', function() gitsigns.setqflist 'all' end, { desc = 'git hunk [Q]uickfix list (all files in repo)', buf = bufnr })
-      vim.keymap.set('n', '<leader>hq', gitsigns.setqflist, { desc = 'git hunk [q]uickfix list (all changes in this file)', buf = bufnr })
-      -- Toggles
-      vim.keymap.set('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line', buf = bufnr })
-      vim.keymap.set('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle git intra-line [w]ord diff', buf = bufnr })
-      -- Text object
-      vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = 'text object [i]nside [h]unk', buf = bufnr })
-    end,
-  }
+  -- vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
+  -- local gitsigns = require 'gitsigns'
+  -- gitsigns.setup {
+  --   signs = {
+  --     add = { text = '+' }, ---@diagnostic disable-line: missing-fields
+  --     change = { text = '~' }, ---@diagnostic disable-line: missing-fields
+  --     delete = { text = '_' }, ---@diagnostic disable-line: missing-fields
+  --     topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
+  --     changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
+  --   },
+  --   -- gitsigns.nvim's recommended keymaps:
+  --   on_attach = function(bufnr)
+  --     -- Navigation
+  --     vim.keymap.set('n', ']c', function()
+  --       if vim.wo.diff then
+  --         vim.cmd.normal { ']c', bang = true }
+  --       else
+  --         gitsigns.nav_hunk 'next'
+  --       end
+  --     end, { desc = 'Jump to next git [c]hange', buf = bufnr })
+  --
+  --     vim.keymap.set('n', '[c', function()
+  --       if vim.wo.diff then
+  --         vim.cmd.normal { '[c', bang = true }
+  --       else
+  --         gitsigns.nav_hunk 'prev'
+  --       end
+  --     end, { desc = 'Jump to previous git [c]hange', buf = bufnr })
+  --
+  --     -- Visual mode actions
+  --     vim.keymap.set('v', '<leader>hs', function() gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' } end, { desc = 'git [s]tage hunk', buf = bufnr })
+  --     vim.keymap.set('v', '<leader>hr', function() gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' } end, { desc = 'git [r]eset hunk', buf = bufnr })
+  --     -- Normal mode actions
+  --     vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'git preview hunk [i]nline', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hb', function() gitsigns.blame_line { full = true } end, { desc = 'git [b]lame line', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hD', function() gitsigns.diffthis '~' end, { desc = 'git [D]iff against last commit', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hQ', function() gitsigns.setqflist 'all' end, { desc = 'git hunk [Q]uickfix list (all files in repo)', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>hq', gitsigns.setqflist, { desc = 'git hunk [q]uickfix list (all changes in this file)', buf = bufnr })
+  --     -- Toggles
+  --     vim.keymap.set('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line', buf = bufnr })
+  --     vim.keymap.set('n', '<leader>tw', gitsigns.toggle_word_diff, { desc = '[T]oggle git intra-line [w]ord diff', buf = bufnr })
+  --     -- Text object
+  --     vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = 'text object [i]nside [h]unk', buf = bufnr })
+  --   end,
+  -- }
 
   -- Useful plugin to show you pending keybinds.
   vim.pack.add { gh 'folke/which-key.nvim' }
@@ -423,18 +430,25 @@ do
   -- change the command under that to load whatever the name of that colorscheme is.
   --
   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
+  vim.pack.add { gh 'rebelot/kanagawa.nvim' }
   ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
-    styles = {
-      comments = { italic = false }, -- Disable italics in comments
+  require('kanagawa').setup {
+    theme = 'wave',
+    colors = {
+      theme = {
+        all = {
+          ui = {
+            bg_gutter = 'none',
+          },
+        },
+      },
     },
   }
 
   -- Load the colorscheme here.
   -- Like many other themes, this one has different styles, and you could load
   -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  vim.cmd.colorscheme 'kanagawa'
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -465,6 +479,14 @@ do
     },
     n_lines = 500,
   }
+
+  require('mini.indentscope').setup {
+    options = {
+      try_as_border = true,
+    },
+    symbol = ' ',
+  }
+  require('mini.pairs').setup()
 
   -- Add/delete/replace surroundings (brackets, quotes, etc.)
   --
@@ -572,16 +594,20 @@ do
       local buf = event.buf
 
       -- Find references for the word under your cursor.
-      vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
+      vim.keymap.set('n', 'gr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
 
       -- Jump to the implementation of the word under your cursor.
       -- Useful when your language has ways of declaring types without an actual implementation.
-      vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+      vim.keymap.set('n', 'gi', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+
+      vim.keymap.set('n', 'ge', function()
+        vim.diagnostic.jump({count = 1, severity = vim.diagnostic.severity.ERROR, float = true})
+        end, { buffer = buf, desc = '[G]oto [I]mplementation' })
 
       -- Jump to the definition of the word under your cursor.
       -- This is where a variable was first declared, or where a function is defined, etc.
       -- To jump back, press <C-t>.
-      vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+      vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
 
       -- Fuzzy find all the symbols in your current document.
       -- Symbols are things like variables, functions, types, etc.
@@ -791,7 +817,7 @@ do
 
   -- Translates between nvim-lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
   require('mason-lspconfig').setup {
-    automatic_enable = false, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
+    automatic_enable = true, -- Change this to true if you want to automatically enable servers that are installed manually (e.g. via :Mason / :MasonInstall)
   }
 
   -- Ensure the servers and tools above are installed
@@ -897,6 +923,9 @@ do
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
       preset = 'default',
+      ['<Enter>'] = { 'accept', 'fallback' },
+      ['<Tab>'] = { 'fallback' },
+      ['<S-Tab>'] = { 'fallback' },
 
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -951,32 +980,50 @@ do
   local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
   require('nvim-treesitter').install(parsers)
 
-  ---@param buf integer
-  ---@param language string
-  local function treesitter_try_attach(buf, language)
-    -- Check if a parser exists and load it
-    if not vim.treesitter.language.add(language) then return end
 
-    -- Check if the buffer is valid (might not be after install completes)
-    if not vim.api.nvim_buf_is_valid(buf) then return end
+---@param buf integer
+---@param language string
+local function treesitter_try_attach(buf, language)
+  -- Check if a parser exists and load it
+  if not vim.treesitter.language.add(language) then return end
 
-    -- Enable syntax highlighting and other treesitter features
-    vim.treesitter.start(buf, language)
+  -- Check if the buffer is valid (might not be after install completes)
+  if not vim.api.nvim_buf_is_valid(buf) then return end
 
-    -- Enable treesitter based folds
-    -- For more info on folds see `:help folds`
-    -- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    -- vim.wo.foldmethod = 'expr'
+  -- Enable syntax highlighting and other treesitter features
+  vim.treesitter.start(buf, language)
 
-    -- Check if treesitter indentation is available for this language, and if so enable it
-    -- in case there is no indent query, the indentexpr will fallback to the vim's built in one
-    local has_indent_query = vim.treesitter.query.get(language, 'indents') ~= nil
+  -- Treesitter indentation, skipping C/C++ (cindent handles Doom's style better)
+  local has_indent_query = vim.treesitter.query.get(language, 'indents') ~= nil
+  if has_indent_query and language ~= 'c' and language ~= 'cpp' then
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end
+  end
+  local available_parsers = require('nvim-treesitter').get_available()
 
-    -- Enable treesitter based indentation
-    if has_indent_query then vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
+  function _G.fold_text()
+    local line = vim.fn.getline(vim.v.foldstart)
+    local out = "~";
+    out = out .. string.sub(line, 0, string.len(line));
+    out = string.gsub(out, "[={}]", "");
+    local isStruct = string.find(out, "struct");
+    local isEnum = string.find(out, "enum");
+    if isStruct ~= nil or isEnum ~= nil then
+      local lastLine = vim.fn.getline(vim.v.foldend)
+      local length = string.len(lastLine)
+      out = out .. lastLine:sub(2, length - 1);
+    end
+    return out
   end
 
-  local available_parsers = require('nvim-treesitter').get_available()
+  vim.opt.foldlevelstart = 99
+  vim.api.nvim_create_autocmd('FileType', {
+    callback = function()
+      vim.wo[0][0].foldmethod = 'expr'
+      vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+      vim.wo[0][0].foldtext = 'v:lua.fold_text()'
+    end,
+  })
   vim.api.nvim_create_autocmd('FileType', {
     callback = function(args)
       local buf, filetype = args.buf, args.match
@@ -1018,7 +1065,7 @@ do
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
+  require 'kickstart.plugins.neo-tree'
 
   -- NOTE: You can add your own plugins, configuration, etc. in `lua/custom/plugins/*.lua`.
   --
